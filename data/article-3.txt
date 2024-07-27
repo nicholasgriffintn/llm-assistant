@@ -1,0 +1,136 @@
+
+## HTTP/2 is easy, just turn it on…
+
+[HTTP/2](https://tools.ietf.org/html/rfc7540) (h2), the successor to HTTP/1.x (h1), started to gain significant mainstream support with service providers such as [CDN](https://en.wikipedia.org/wiki/Content_delivery_network)s during 2016. A major design goal of h2 is improved performance over h1 and some of the optimisations it makes include:
+
+* HTTP header compression (via [HPACK](https://tools.ietf.org/html/rfc7541)) — reduces the volume of data transmitted
+
+* A binary (rather than text-based) protocol — faster and simpler to interpret accurately
+
+* Request multiplexing — allows more efficient use and reuse of connections for many requests
+
+* (Optional) [push](https://en.wikipedia.org/wiki/HTTP/2_Server_Push) — assets can be pushed from the server to the client without the client needing to request the asset first, saving a round trip
+
+* Connection coalescing — requests for assets/resources across different hostnames can be made over a single h2 connection. This promises fewer TCP connections and TLS handshakes, thus reduced overall latency
+
+Expanding on the last point, connection coalescing can (optionally) be employed by a client only if the same TCP/TLS connection can be reused. TCP/TLS connection reuse logically mandates that:
+
+* Each hostname resolves to the same IP address — i.e. the remote endpoint is the same
+
+* The hostnames of the URLs are covered by/present in the same TLS certificate (via common name or SAN ([Subject Alternative Name](https://en.wikipedia.org/wiki/Subject_Alternative_Name)) entries, either directly or as a result of wildcard hostnames) — i.e. the TLS connection will be valid for each hostname
+
+Thus requests to e.g. a.example.com, b.example.com and c.example.com can be made over the *same* h2 connection provided that the DNS record for a.example.com, b.example.com and c.example.com ultimately resolve to the same IP address *and* that a.example.com, b.example.com and c.example.com are all covered (either by SAN entries or via wildcard) on the same TLS certificate which is presented by the endpoint. This differs from h1 wherein a dedicated connection per hostname (actually, typically, a browser will open up to 6 connections per hostname to allow parallel requests) will be opened, though this may be reused for multiple, sequential requests if keep-alive is enabled.
+
+Of the popular (in the UK — our main audience) desktop/mobile web browsers, Chrome and Firefox notably offer h2 connection coalescing (at the time of writing) whereas, for example, Safari, Internet Explorer and Edge do not. Chrome and Firefox make up a significant proportion (around 45%) of the BBC online client-base so connection coalescing needs to be carefully considered to ensure that HTTP requests are sent to the correct server(s)/services and that these servers/services are h2-capable.
+
+## Benefits of h2
+
+The optimisations in h2 make it an attractive proposition for BBC Online, so we ran some simple trials on BBC website content to establish the likely benefits to our audience. In our internal trials, serving our web pages over networks with high latency (i.e. hundreds of milliseconds) proved to be up to 40% faster than over h1, with a small performance penalty (typically 0–2%) over very fast, low latency networks. The small performance penalty on faster networks is not particularly significant (as the absolute amount of delay introduced, is very low and further optimisations in h2 will likely nullify it) but the improvement for high-latency connections is clearly attractive, which should give some significant benefits for example to users on mobile networks.
+
+Mobile device usage is increasingly prevalent and BBC Online is no exception to this trend. Some of our product websites are particularly popular in countries in which mobile networks are often relatively poor quality; low bandwidth and high latency. Audiences in such geographies could certainly benefit from h2’s improvements in performance and reduced data usage (and thus cost). Additionally, it’s likely that users of h2 on poor networks might experience reduced battery usage on mobile devices due to decreased use of the radio electronics in their devices.
+
+It’s worth noting that h2 does have a specific known problem with [Head Of Line (HOL) blocking](https://en.wikipedia.org/wiki/Head-of-line_blocking) under high packet loss conditions. This was understood during the writing of the h2 specification, but was accepted as a “known issue”; improvements have been made to address this in the potential successor to h2, [QUIC](https://en.wikipedia.org/wiki/QUIC). Some clients make efforts to detect and mitigate HOL blocking via various means.
+
+## Migrating to h2
+
+h2 requires support on both the client and the server side of a connection. Aside from a small number of notable exceptions, such as the popular HTTP cache server software [Varnish](https://info.varnish-software.com/blog/now-available-varnish-cache-5-http2-support), most h2 implementations require an HTTPS (rather than HTTP) connection. BBC Online began working both internally and with 3rd party suppliers towards making content available over HTTPS as far back as mid/late 2014 (our last interim update on HTTPS was in [Paul Tweedy’s blog post](http://www.bbc.co.uk/blogs/internet/entries/f6f50d1f-a879-4999-bc6d-6634a71e2e60)), and it is this work that has fulfilled the HTTPS prerequisite for widespread h2 adoption for BBC Online.
+
+By design, h2 can mostly be considered a drop-in replacement for h1, but there are 2 potentially important yet subtle differences:
+
+* HTTP header *names* are forced to lowercase by h2 encoders. The [h1 spec](https://tools.ietf.org/html/rfc7230#section-3.2) by contrast allows mixed-case header names but mandates case-insensitive comparison/handling. So h1 requests would for example typically include an HTTP header named “Accept-Encoding”, which would be represented as “accept-encoding” in h2.
+
+* HTTP status codes contain *only* the numeric component in h2. [h1 status codes](https://tools.ietf.org/html/rfc7230#section-3.1.2) also include an optional textual field. So whereas h1 would for example return a status code of “200 OK”, h2 would return simply “200”. This *might* matter for e.g. proxies/CDNs and/or front-end code which relies on the string component.
+
+During our initial internal testing, the former difference (force-lowercased header names) resulted in at least one problem for an application in our stack which failed to handle HTTP header names case-insensitively — it expected the typical h1-style camel case.
+
+![](https://cdn-images-1.medium.com/max/2000/0*RYAsUAa18axp1gSs.)
+
+Most proxy-like applications and services (such as CDNs) which offer h2 do so only on inbound connections. The onward connection to origin is usually still h1 ([Caddy](https://caddyserver.com/) is a notable exception which can make h2 or now even [QUIC](https://en.wikipedia.org/wiki/QUIC) connections to origins).
+
+During testing, we found that one of our CDNs re-capitalises “common” HTTP request headers which the client’s h2 encoder has force-lowercased. This seems slightly odd on first inspection but I assume they’re trying to make h2 adoption as simple as possible, even for non-standards-compliant origin services.
+
+Armed with some positive test results and the experience of the problems above, we set out to enable h2 for BBC Online, first in our pre-live staging environment, then in production.
+
+## Selecting where to enable h2 first
+
+The way in which the [BBC delivers Web Pages](https://medium.com/bbc-design-engineering/how-we-deliver-bbc-web-pages-to-the-internet-9b72f48f857c) (tl;dr: we use path-based routing) means that enabling h2 on [www.bbc.co.uk](http://www.bbc.co.uk) and/or [www.bbc.com](http://www.bbc.com) requires us to validate that *all* the individual websites which sit on those shared hostnames are h2-compatible (at least once the websites are available over HTTPS) since we have to enabled h2 on a hostname-basis. h2-enabling the web pages themselves is therefore going to take a little while for all our applications to be tested and validated.
+
+The static assets for our web pages though are a great candidate for h2, since there are often 80–120 static assets for a typical BBC web page and they’re mostly served by the same CDN, via the same CDN slot (a “slot” is a dedicated set of IP addresses with associated TLS certificate and configuration), across a number of hostnames. This means that an h2-capable user agent can make use of h2 connection coalescing and potentially make all of those 80–120 requests over a single h2 connection, saving a significant number of round trips and TLS handshakes. Static assets are also extremely unlikely to have issues being served over h2 since there is no dynamic processing of headers etc. Decision made! Step 1 would be to h2 our CDN’d web page static assets.
+
+## Enabling h2 on our CDN
+
+The CDN we use for our website static assets mandates that when enabling h2, we specify a hostname filter (either “is” or “isn’t” == <hostname>). This is actually quite helpful because we need granular control over which hostnames are served over h2 because, as noted above, some of our applications may require some work to ensure they work properly over h2.
+
+The CDN configuration was discussed, agreed, announced to our teams, change controlled, monitored and deployed via our normal processes — pre-live environments first. The new CDN configuration enabled h2 on all asset types except those which had the potential to suffer issues related to h2’s lowercase headers, or had not yet been tested over h2.
+
+Everything looked fine until, after reloading some affected pages a few times, we noticed that some of the hostnames we’d specifically disallowed h2 on *were* being used in an h2 shared connection context. Time to execute a CDN configuration rollback, and investigate!
+
+Once we had some time to look at what was happening, we found the problem. Note that:
+
+* The browser (user agent) used in testing is h2 capable and supports connection coalescing
+
+* The hostname used for all BBC assets may vary (e.g. <context>.bbc[i].co.uk) but most of them result in a connection to the same CDN endpoint
+
+* The TLS certificate presented for connections to the asset endpoints is valid for all relevant hostnames
+
+When loading a BBC webpage, the browser would naturally make requests to our CDN for page assets as specified in the HTML and loaded by scripts, SVG and the like. As soon as one request for an asset on a hostname with h2 enabled succeeded, all subsequent asset requests (since they share the same CDN slot and TLS certificate and thus are appropriate for connection coalescing) would also be made over h2, regardless of whether the hostname being requested was enabled for h2 or not!
+
+## Why are h2 connections unexpectedly shared?
+
+The CDN “knows” that we have *disabled* h2 on some hostnames and the h2 spec *does* make provision for the server to inform the client that it shouldn’t serve the content over h2, via a new HTTP status code — [421 “misdirected request”](https://tools.ietf.org/html/rfc7540#section-9.1.2). The detail of the spec is important here though and seems to have introduced a circular problem. The server-side element of the h2 specification states:
+>  “The 421 (Misdirected Request) status code indicates that the request was directed at a server that is not able to produce a response. This can be sent by a server that is not configured to produce responses for the combination of scheme and authority that are included in the request URI.”
+
+The issue here being that serving a 421 is *not* defined as a *mandatory* behaviour.
+
+Unfortunately, the lack of hard requirement for 421’s being returned is compounded by the client-side element of the specification which states:
+>  “Clients receiving a 421 (Misdirected Request) response from a server MAY retry the request — whether the request method is idempotent or not — over a different connection. This is possible if a connection is reused (Section 9.1.1) or if an alternative service is selected [ALT-SVC]”
+
+The issue *here* being that handling of the 421 by the client is also *not* mandatory (since it’s specified as “MAY”). Ideally, to resolve the issue, this “MAY” would be “SHOULD” since “SHOULD” typically results in most implementations of a specification including a feature. It’s probably unrealistic to change this “MAY” to a “MUST”, since it’s possible that the client may, for example, have network connectivity constraints which prevent a retry.
+
+To the best of my knowledge, Firefox *does* attempt to handle an HTTP 421 response via a retry but Chrome currently does not, although [work to implement it in Chromium](https://bugs.chromium.org/p/chromium/issues/detail?id=546991) (i.e. upstream from Chrome) is complete. Most other “major” browsers, IE, Edge, Safari et al don’t implement h2 connection coalescing yet so this doesn’t apply to them. Our CDN vendor elected not to send 421’s, because they can’t rely on it being handled by the client.
+
+## The (temporary) workaround
+
+After talking the connection coalescing problem through with our CDN vendor, we came up with a workaround which is designed to break the conditions under which h2 connections are allowed to be shared, and thus to guarantee that our not yet h2-validated applications won’t be served over h2.
+
+Since the conditions for connection coalescing are “same endpoint” and “same TLS certificate” (i.e. same TLS connection), we have to break at least one of these conditions to *avoid* connections coalescing. Migrating hostnames between certificates is operationally inflexible; we have certificate supply lead times to consider in the event that an incident means we’d need to disable/enable h2 for specific hostnames, so this is not a realistic option. In theory, our CDN could automatically serve all their customers h2-enabled configurations on dedicated h2-only IP addresses, but that would require significant engineering work for our CDN vendor and is thus also impractical. We therefore opted to create and use a new TLS “slot” in the CDN for the problem hostnames, since this results in a different group of IP addresses for those hostnames:
+
+![](https://cdn-images-1.medium.com/max/2000/0*R9mxCiKHq56SOI98.)
+
+This workaround is not ideal; sadly, it’s quite brittle in practice but is the most workable solution we had available. Consider the following operational scenario:
+
+* A new h2-enabled asset hostname is required on our CDN configuration
+
+* When adding the new hostname to our CDN configuration, we accidentally select the wrong “slot” (the h1-only slot); this is very easy to do, given that there’s no actual difference between the configuration of the slots
+
+* The new hostname starts to be used on live web pages that have h1-only assets on them
+
+* A user visits a web page that contains assets under the new hostname
+
+* When the browser connects to the new h2-enabled hostname, it will automatically make *h2* requests down the same connection for all the *h1-only*** **asset hostnames on that page, since they all resolve to the same IP and are covered by the TLS certificate
+
+* Since (as described above) the h2 protocol provides no reliable way of telling the browser it made an invalid request, the CDN will serve the h1-only assets over h2
+
+This might not sound like a huge problem, but we have around 150 hostnames across about 10 CDN configurations to manage at the moment (we’ll collapse some down as we consolidate on h2) and this is a non-standard practice, so it’s very much vulnerable to human error. Not great but it’s short term at least.
+
+## Origin frame
+
+[Origin Frame](https://tools.ietf.org/html/draft-ietf-httpbis-origin-frame-04) is a draft for an extension to the h2 specification, which provides an additional layer of configuration on h2 connection coalescing. Using this extension could allow us to specify in a standards-compliant fashion (i.e. not specific to the CDN described in this use case) our preferences for h2 connection coalescing on a hostname-by-hostname basis. Using a standards-based method would be very much preferred over the workaround we’ve had to employ.
+
+## Enabling h2 — at last!
+
+Our initial h2 deployment on our CDN configuration had our h2-capable applications/services (the vast majority) on one (h2-only) slot and the not yet h2-validated applications/services on the other (h1-only) slot. We then migrated the remainder of our applications to the h2 slot once they were validated as h2-capable. We’ve now enabled h2 on the vast majority of our public-facing services so, for example, if you visit [https://www.bbc.co.uk/](https://www.bbc.co.uk/) (if you’re in the UK) or [https://www.bbc.com/pidgin](https://www.bbc.com/pidgin) (from anywhere in the world) with a capable client (e.g. recent Chrome, Firefox, Edge etc.), you’ll be served virtually the entire page over h2.
+
+## Results
+
+In order to monitor the real-world effect on page load performance of our h2 deployments, I added some specific tests to our synthetic monitoring platform. These new tests are run from a small number of “network far” (from our UK origin) locations. For each location we run both an h1 and a h2 page load using Chrome every 10 minutes, requesting [our account signout page](https://account.bbc.com/signout) and all page assets. This certainly isn’t a large-scale scientific study but it does give an idea of the range of performance improvements h2 can bring. It’s probably worth noting that these tests are synthetic and therefore not necessarily *identical *to what our audience will see but they *do* measure h1 versus h2 performance reliably and therefore give a good perspective for our purposes.
+
+ <iframe src="https://medium.com/media/babff6af3d2a29ff0cab34f66e2b81e3" frameborder=0></iframe>
+
+Note: All times are in seconds, rounded to 2 decimal places
+
+These data indicate that our initial tests were pretty representative of real world performance — this is great news since it means h2 offers some genuine benefit to our audience (at least those who are viewing pages over HTTPS). The page tested (signout) is very typical of BBC web pages so I’d expect the results to be similar across other pages from BBC Online. A 1.2 second reduction in page load time should be very noticeable to our audience in Argentina. As more of our websites migrate to HTTPS, our audience will see the double benefit of assured authenticity of content along with a boost in performance.
+
+## Questions?
+
+If there are elements you’d like to know more about or something you’d like clarified, please leave a comment or send me a message on Twitter [@tdp_org](https://twitter.com/tdp_org).

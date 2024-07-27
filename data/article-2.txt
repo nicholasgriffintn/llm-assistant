@@ -1,0 +1,89 @@
+
+## Things I have learned about Tech Leadership
+
+I have now been a Software Engineering Team Lead on the BBC Sounds mobile apps team for 4 years. So what have I learned from this once-daunting, now-familiar role?
+
+## Leadership does not mean telling people what to do.
+
+![Mother Goose is holding back here and letting the baby gosling stride confidently ahead](https://cdn-images-1.medium.com/max/2480/1*fTMnEJSAeFJrGe3LIiTlxQ.jpeg)
+
+Before working at the BBC, I thought a tech lead’s job was to think of some work to do and command others to do it.
+
+It was quite a damaging misconception, because it stopped me considering moving up from a software engineer into management. I don’t like telling people what to do. This is because I also don’t like being told what to do. As the youngest of four siblings, I have perhaps been overexposed to being bossed around. If someone ever talks to me in the imperative, I have an immediate, instinctive visceral response which vastly reduces the likelihood of my compliance with the request. I suspect I am not unique in this. So I never wanted to be That Guy, who makes other people feel like that.
+
+But the excellent news is — it turns out you don’t need to be! The great thing is, grown up people are entirely capable of managing their own workloads. Assigning people specific tasks can often feel like micromanagement to them. If it is clear what tasks need to be done, people will prioritise the tasks into their own work streams and pick them up when they have capacity to do so.
+
+## Collective decision making is good
+
+Another thing I used to think leaders had to do, was go and make up bold, dazzling strategies all by themselves and then tell everyone about their vision. Dictatorially make a swathe of tickets and dump them onto the board, whilst loudly trumpeting about their own self-worth in some public channel. In real life this will get you a lot of side-eye of course.
+
+I vastly prefer the approach of talking through what needs to be done with the team and making sure everyone understands why it is important. We can work together to outline the high level goals and then discuss breaking the work down into tickets. Working together towards a shared vision is much more motivating for the team than being told exactly what to do and when. You want to get plenty of input from everyone when defining a scope of work — a team are likely to come up with better ideas for implementing stuff than a single person.
+
+## Not every hill is worth dying on
+
+![This was a lovely hill for example. No deaths were required.](https://cdn-images-1.medium.com/max/2000/1*i_QE3KiZ3ZPEWDNjhi_AaQ.jpeg)
+
+Like many things in people management, this is reminiscent of a common parenting strategy — often summarised as “pick your battles”.
+Influence in the workplace is like a currency which you can choose to spend in a particular argument or not. You can only really build this up to a high level in a slow, laborious way by gaining people’s trust over time. You get people’s trust by listening to their problems, seeing things from their side and helping them to fix things.
+
+There aren’t really any shortcuts here unfortunately. If you try and wield influence without having enough trust behind it, people will generally politely ignore you. And even if you have plenty of trust, trying to influence too many things is not a good idea. People’s goodwill gets depleted the more you mither them. They will eventually stop listening to you if you are constantly sticking your oar in where it’s not required. You should also trust your team to make their own decisions.
+
+Influence is most powerful when it’s used sparingly on something that is genuinely important — eg. you have an idea which will have a significant observable impact on your users, and you can clearly explain how it works and how it could be measured. If someone has used tabs instead of spaces in a PR, whilst it may superficially irritate you on a stylistic level, you might want to consider saving up that influence for another day.
+
+## Rumpelstiltskin is a role model
+
+To be 100% clear, not in terms of theft of babies or weird name-guessing antics. For metaphorical purposes I am specifically thinking about this fairytale character’s ability to spin a roomful of straw into gold.
+
+![Side note: Rumpelstiltskin has a magnificent outfit here, he could be a fashion role model also](https://cdn-images-1.medium.com/max/2000/1*alficc7ixfBnZnIgGFfepQ.jpeg)
+
+Sometimes at work, you will be given a task that you do not agree with but have little influence over. In this case, I think it’s useful to flag any concerns, with a clear, objective description of where you can foresee problems. But sometimes, the needs of other stakeholders outweigh other issues that you may have identified. I don’t generally expect my concerns to override everyone else’s and do not seek to veto every decision according to my personal whims.
+
+So maybe a decision didn’t go your way. Congratulations! You are now the proud owner of a roomful of straw and you need to give this to your team to build meaningful things from. They are not going to like being given straw. So I recommend spinning it into gold first before presenting it to the team. Yes, this is basically politics, a word which is often used pejoratively at work. But it is an incredibly useful skill for keeping teams engaged.
+
+Nobody is going to feel inspired and motivated to build something that is presented to them as a bad idea from the outset.
+Your goal is to try and build team enthusiasm in the project. How do you do this if you don’t feel 100% behind the idea? It is hard, when your ego has been bruised. But at work in general, your ego is best left at the door. You could present the motivations that other people have given for it — acknowledge concerns but focus on the positives. If you are not in a situation where you can influence the decision, there is no benefit from stating that you don’t agree with it. And actually this can end up being more frustrating to the team than if you commit to an unpalatable outcome. 
+It’s good to document difficult decisions like this, as it can be painful to keep re-hashing conversations. You could use the document to finesse the framing of the approach — focussing on a long term preferred vision which addresses all concerns and keeps all stakeholders happy.
+
+## What is the most helpful thing I can do for the team right now?
+
+This is a question I like to ask myself a lot.
+As a leader, it can be hard to know what to focus on. Gone are the days of all your work being nicely encapsulated for you in tickets and your days punctuated by meetings that other people organise.
+Instead you often veer between having a deluge of messages clamouring for your attention, to periods of complete radio silence where you suddenly need to decide what is the best use of your time.
+
+I like the idea of the ‘servant leader’ — who keeps themselves fully aware of the challenges the team is facing, and constantly works to remove blockers and resolve problems. A ‘fixer’ if you will. Like Mike Ehrmantraut in Breaking Bad or The Wolf in Pulp Fiction.
+
+Sometimes this could be putting in a PR for some dull but essential code that is important but would disrupt the team’s current focus.
+
+Sometimes this could be a difficult conversation where people are arguing and you can help mediate.
+
+Sometimes this could be a boring conversation about who owns that repo and how to get access.
+
+Sometimes, after spending too long in Rumpelstiltskin mode, this could be simply to go into a quiet room and scream into the void for a while until you feel a bit better. If you are feeling stressed and emotional, getting your own head straight is often genuinely the best thing you can do for your team right now.
+
+## Burnout
+
+I should put in a disclaimer before starting this bit, that I haven’t done much reading about burnout, because I have been too busy.
+So I have an idea in my head of what this word means, which may or may not have any overlap with accepted clinical definitions.
+
+![Is it though?](https://cdn-images-1.medium.com/max/3260/1*a5G0rS8Fii5D0tPmm-tfSQ.jpeg)
+
+I do know that I love my job, and I love being busy. But occasionally, one day of continuous consecutive context-switching too many has tipped me over into a state where I am unable to sleep because my brain is constantly buzzing with work related problems. This is not a good place for a person to be. The fatigue carries over into their working day and feeds a positive feedback loop of increased stress which further impedes their ability to sleep. At this point, they really just need a bit of a break to regain their mental and physical composure. Everyone has a limit and I feel there’s little to be gained in the workplace by stumbling over it into a self-destructive realm of vastly reduced productivity.
+
+The good thing about having had this experience is, I can now recognise the early stages of this process. 
+If I notice this happening to me, I know it’s really important to say no to things for a bit until my concurrent workload subsides. 
+I also think it’s a great idea to look out for this in other people. I have seen people at work actively defend other people’s diaries. e.g. In the classic case of a meeting that only exists to spawn another meeting. When someone comes up with a knee-jerk “let’s have another call and invite X” I’ve heard some people reply “Is this really relevant to X? X is pretty busy — I don’t think they really need to go to that call”. These people are legit heroes and we should carry them round on our shoulders cheering.
+
+## Relationships
+
+Interpersonal relationships, to me, are the most important part of a job.
+I like to invest as much time as possible into building good relationships with my colleagues. Small talk may feel like an indulgence, but it makes the big talk easier to approach when it becomes necessary.
+
+If you have fallen out with someone at work, it is important to try and resolve it, however much you may want to skip around the edges of a conflict. If communication is not flowing, it can severely impact the work you are doing.
+
+Conversely, if you have good relationships with your team, literally everything is easier. Understanding a task, asking all the stupid little questions that are in your head. It is much easier to reach out to people that you get on with. And if you genuinely value your colleagues, it makes it a much happier place to work.
+
+The only slight disadvantage of this approach is that there is a risk that when you leave, you will have built up relationships that are very dear to you, and the leaving process may end up accidentally breaking your heart.
+
+## Are you a leader?
+
+Tech leadership may have its tribulations but it is a wonderful and rewarding path to follow. I have learned a lot during my tenure as team lead from the various amazing people that I have had the privilege of working with. I would recommend this path to anyone who hasn’t been put off by my ramblings above. Thank you for reading and good luck upon your quest x
