@@ -37,6 +37,27 @@ def openfile(filename):
     html = markdown.markdown(text)
     return {"text": html}
 
+def post_generate_request(url, headers, payload):
+    """
+    Make a POST request to the LLM API.
+
+    Args:
+        url (str): The URL to make the request to.
+        headers (dict): The headers to include in the request.
+        payload (dict): The payload to include in the request.
+    
+    Returns:
+        dict: The response from the server.
+    """
+
+    try:
+        response = requests.post(url, headers=headers, json=payload, timeout=180)
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as e:
+        logger.error(f"Request failed: {e}")
+        return None
+
 def generate(prompt, options, model_name):
     """
     Generate text using the Ollama API.
@@ -51,7 +72,7 @@ def generate(prompt, options, model_name):
     """
 
     if use_cloudflare:
-        if cloudflare_api_token is None or cloudflare_host is None or cloudflare_account_id is None:
+        if not all([cloudflare_api_token, cloudflare_host, cloudflare_account_id]):
             logger.error("Cloudflare API key, host, or account ID not set.")
             return None
         
@@ -77,29 +98,19 @@ def generate(prompt, options, model_name):
             "options": options
         }
     
-    try:
-        logger.info(f"Requesting generation from {url}...")
-        response = requests.post(url, headers=headers, json=payload, timeout=180)
-        response.raise_for_status()  # Raise an HTTPError for bad responses
-        if use_cloudflare:
-            responseJson = response.json()
-            result = responseJson.get("result")
-            if result is None:
-                logger.error("No response from server")
-                return None
-            success = responseJson.get("success")
-            if success is not True:
-                logger.error("Request failed")
-                return None
-            return result.get("response")
-        else:
-            return response.json().get("response")
-    except requests.exceptions.Timeout:
-        logger.error("Request timed out")
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Request failed: {e}")
-    return None
+    response_json = post_generate_request(url, headers, payload)
+    if not response_json:
+        return None
 
+    if use_cloudflare:
+        result = response_json.get("result")
+        if result is None or not response_json.get("success"):
+            logger.error("Request failed or no response from server")
+            return None
+        return result.get("response")
+    else:
+        return response_json.get("response")
+    
 def generate_and_check(prompt, ollama_options, model_name, article_text):
     """
     Generate text and check if it is sufficiently represented in the article.
@@ -142,7 +153,7 @@ def generate_and_check(prompt, ollama_options, model_name, article_text):
             num_retries -= 1
     
     if not generation_matches:
-        logger.error(f"Failed to generate text after {num_retries} attempts.")
+        logger.error(f"Failed to generate text after {attempts} attempts.")
         return None
     
     return generation
@@ -150,47 +161,46 @@ def generate_and_check(prompt, ollama_options, model_name, article_text):
 def generate_image_to_text(image, ollama_options, image_to_text_model_name):
     res = requests.get(image)
     blob = res.content
+
+    payload = {
+        "prompt": "Generate a caption for this image",
+        "stream": False,
+    }
+
     if use_cloudflare:
         url = f"{cloudflare_host}/client/v4/accounts/{cloudflare_account_id}/ai/run/{image_to_text_model_name}"
         headers = {
             "Authorization": f"Bearer {cloudflare_api_token}",
         }
-        payload = {
+        payload.update({
             "image": list(blob),
-            "prompt": "Generate a caption for this image",
             "max_tokens": 512,
-            "stream": False,
             "seed": ollama_options.get("seed"),
             "temperature": ollama_options.get("temperature"),
             "top_k": ollama_options.get("top_k"),
             "top_p": ollama_options.get("top_p"),
-        }
-        response = requests.post(url, headers=headers, json=payload, timeout=180)
-        response.raise_for_status()  # Raise an HTTPError for bad responses
-        responseJson = response.json()
-        result = responseJson.get("result")
-        if result is None:
-            logger.error("No response from server")
-            return None
-        success = responseJson.get("success")
-        if success is not True:
-            logger.error("Request failed")
-            return None
-        return result.get("description")
+        })
     else:
         url = f"{ollama_host}/api/generate"
         headers = {}
-        payload = {
-            "prompt": "Generate a caption for this image",
+        payload.update({
+            "images": [blob],
             "model": image_to_text_model_name,
-            "stream": False,
             "options": ollama_options,
-            "images": [blob]
-        }
-        response = requests.post(url, headers=headers, json=payload, timeout=180)
-        response.raise_for_status()
+        })
 
-        return response.json().get("response")
+    response_json = post_generate_request(url, headers, payload)
+    if not response_json:
+        return None
+
+    if use_cloudflare:
+        result = response_json.get("result")
+        if result is None or not response_json.get("success"):
+            logger.error("Request failed or no response from server")
+            return None
+        return result.get("description")
+    else:
+        return response_json.get("response")
 
 def check_summary(summary, article):
     """
@@ -201,11 +211,19 @@ def check_summary(summary, article):
         article (str): The article to check against.
 
     Returns:
-        bool: True if all quotes in the summary are sufficiently represented in the article, False otherwise.
+        bool: True if all quotes in the summary are sufficiently represented in the article. False otherwise (including if there are no quotes).
     """
-    
+
+    if not summary or not article:
+        logger.warning("Empty summary or article provided.")
+        return False
+
     # Find quotes in the summary
     matches = re.findall(r'"(.*?)"', summary)
+    if not matches:
+        logger.info("No quotes found in the summary.")
+        return False
+
     article = article.lower()
 
     for match in matches:
@@ -213,11 +231,11 @@ def check_summary(summary, article):
         parts = match.split("...")
         for part in parts:
             words = part.split()
-            valid_words = sum(1 for word in words if word.strip(string.punctuation) in article)
             if len(words) == 0:
                 return True
+            valid_words = sum(1 for word in words if word.strip(string.punctuation) in article)
             pc_valid = valid_words / len(words)
-            logger.info(f"pc_valid: {pc_valid}")
+            logger.info(f"Quote: '{part}', Valid words: {valid_words}/{len(words)}, pc_valid: {pc_valid:.2f}")
             if pc_valid < 0.8:
                 return False
     return True
