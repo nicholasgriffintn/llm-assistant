@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% set active_page = "summarise" %}
+
+{% block title %}Summarise Content{% endblock %}
+
+{% block head %}
+{{ super() }}
+
+
+{% endblock %}
+
+{% block page_content %}
+<h1 class="cap">Summarise Content</h1>
+{% if message %}
+{{ message }}
+{% endif %}
+{% if result %}
+<h2>The result is {{result}}.</h2>
+{% endif %}
+<h3>Submit Request</h3>
+<form action="/summarise" method="post">
+  <input type="text" name="query" value="" required />
+  <input type="submit">
+</form>
+
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+
+{% endblock %}
