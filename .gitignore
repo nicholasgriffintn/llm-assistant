@@ -1,7 +1,5 @@
 # FastAPI starter
 .DS_Store
-!/data/.keep
-/data
 /tmp
 
 

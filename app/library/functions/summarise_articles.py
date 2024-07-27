@@ -39,7 +39,7 @@ def summarise_articles(source, summaries, ollama_options, model_name):
                 )
                 report_ok = check_summary(report, combined_summaries)
                 if report_ok:
-                    output_path = Path(f"app/pages/{source}.report.{model_name}.md")
+                    output_path = Path(f"{source}.report.{model_name}.md")
                     output_path.write_text(report, encoding="utf-8")
                     logger.info(f"Report successfully generated and saved to {output_path}")
                 else:

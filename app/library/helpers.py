@@ -89,6 +89,8 @@ def check_summary(summary, article):
         for part in parts:
             words = part.split()
             valid_words = sum(1 for word in words if word.strip(string.punctuation) in article)
+            if len(words) == 0:
+                return True
             pc_valid = valid_words / len(words)
             logger.info(f"pc_valid: {pc_valid}")
             if pc_valid < 0.8:
