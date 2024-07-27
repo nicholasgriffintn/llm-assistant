@@ -69,8 +69,16 @@ def summarise( source, should_chunk=False, compare=False ):
 
         if should_chunk and compare:
             summary_one = summarise_article( article_text, article_name, ollama_options, model_name, image_to_text_model_name )
-            summary_two = summarise_article_split( article_text, article_name, ollama_options, model_name )
-            summary = summarise_articles( article_name, [summary_one, summary_two], ollama_options, model_name )
+            if summary_one is None:
+                return ""
+            summary_split = summarise_article_split( article_text, article_name, ollama_options, model_name )
+            if summary_split is None:
+                return ""
+            summary_two = summarise_articles( article_name, summary_split, ollama_options, model_name )
+            if summary_two is None:
+                return ""
+
+            summary = f"{summary_one}\n\n{summary_two}"
         elif should_chunk:
             summary = summarise_article_split( article_text, article_name, ollama_options, model_name )
         else:

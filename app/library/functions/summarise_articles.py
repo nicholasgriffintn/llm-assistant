@@ -1,7 +1,7 @@
 from pathlib import Path
 from alive_progress import alive_bar
 
-from ..helpers import generate, check_summary, logger
+from ..helpers import generate_and_check, logger
 
 def summarise_articles(article_name, summaries, ollama_options, model_name):
     """
@@ -27,36 +27,26 @@ def summarise_articles(article_name, summaries, ollama_options, model_name):
         return
 
     combined_summaries = "###\n".join(summaries)
-    report_ok = False
-    retries = 5
-    attempts = 0
 
     with alive_bar() as bar:
-        while not report_ok and retries > 0:
-            attempts += 1
-            try:
-                report = generate(
-                    report_template.format(docs=combined_summaries),
-                    ollama_options,
-                    model_name
-                )
-                report_ok = check_summary(report, combined_summaries)
-                if report_ok:
-                    encoded_model_name = model_name.replace("/", "_").replace("@", "_")
-                    output_path = Path(f"{article_name}.report.{encoded_model_name}.md")
-                    output_path.write_text(report, encoding="utf-8")
-                    logger.info(f"Report successfully generated and saved to {output_path}")
-                else:
-                    logger.warning(f"Report generation failed. Retries left: {retries - 1}")
-                    retries -= 1
-            except Exception as e:
-                logger.error(f"Error during report generation: {e}")
-                retries -= 1
-            bar()
+        try:
+            report = generate_and_check(
+                report_template.format(docs=combined_summaries),
+                ollama_options,
+                model_name,
+                combined_summaries
+            )
+            if report:
+                encoded_model_name = model_name.replace("/", "_").replace("@", "_")
+                output_path = Path(f"{article_name}.report.{encoded_model_name}.md")
+                output_path.write_text(report, encoding="utf-8")
+                logger.info(f"Report successfully generated and saved to {output_path}")
+            else:
+                logger.error("Failed to generate a valid report after multiple attempts.")
+        except Exception as e:
+            logger.error(f"Error during report generation: {e}")
+        bar()
 
-        if not report_ok:
-            logger.error("Failed to generate a valid report after multiple attempts.")
-
-    logger.info(f"Finished. Generated report in {attempts} total attempts.")
+    logger.info(f"Finished. Generated report.")
 
     return report

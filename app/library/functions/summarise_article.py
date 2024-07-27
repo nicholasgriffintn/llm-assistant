@@ -1,7 +1,7 @@
 from pathlib import Path
 from alive_progress import alive_bar
 
-from ..helpers import generate, check_summary, logger, generate_image_to_text
+from ..helpers import generate_and_check, check_summary, logger, generate_image_to_text
 
 def summarise_article( article_text, article_name, ollama_options, model_name, image_to_text_model_name ):
     """
@@ -49,12 +49,13 @@ def summarise_article( article_text, article_name, ollama_options, model_name, i
     generated = None
     with alive_bar() as bar:
         try:
-            generated = generate( 
+            generated = generate_and_check( 
                 prompt_template.format(
                     docs = article_text
                 ),
                 ollama_options,
-                model_name
+                model_name,
+                article_text
             )
             bar()
         except Exception as e:
@@ -68,8 +69,5 @@ def summarise_article( article_text, article_name, ollama_options, model_name, i
     except IOError as e:
         logger.error(f"Error writing summary to file: {e}")
         return
-
-    summary_check = check_summary(generated, article_text)
-    logger.info(f"Overall summary passes check? {summary_check}")
 
     return generated

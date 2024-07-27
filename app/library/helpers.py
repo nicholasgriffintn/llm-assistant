@@ -4,6 +4,7 @@ import requests
 import logging
 import re
 import string
+import random
 
 from .config import ollama_host, use_cloudflare, cloudflare_api_token, cloudflare_host, cloudflare_account_id
 
@@ -58,11 +59,13 @@ def generate(prompt, options, model_name):
         headers = {
             "Authorization": f"Bearer {cloudflare_api_token}",
         }
-        inputs = [
-            { "role": "user", "content": prompt }
-        ];
         payload = {
-            "messages": inputs
+            "prompt": prompt,
+            "stream": False,
+            "seed": options.get("seed"),
+            "temperature": options.get("temperature"),
+            "top_k": options.get("top_k"),
+            "top_p": options.get("top_p"),
         }
     else:
         url = f"{ollama_host}/api/generate"
@@ -97,6 +100,53 @@ def generate(prompt, options, model_name):
         logger.error(f"Request failed: {e}")
     return None
 
+def generate_and_check(prompt, ollama_options, model_name, article_text):
+    """
+    Generate text and check if it is sufficiently represented in the article.
+
+    Args:
+        prompt (str): The prompt to generate text from.
+        options (dict): The options to use for generation.
+        model_name (str): The model to use for generation.
+        article_text (str): The article to check against.
+
+    Returns:
+        str: The generated text if it is sufficiently represented in the article, None otherwise.
+    """
+
+    generation_matches = False
+    generation = None
+    options = ollama_options.copy()
+    num_retries = 2
+    attempts = 0
+
+    while not generation_matches and num_retries > 0:
+        attempts += 1
+
+        logger.info(f"Attempt #{attempts} to generate text...")
+
+        try:
+            generation = generate(prompt, ollama_options, model_name)
+            generation_matches = check_summary(generation, article_text)
+
+            if generation_matches:
+                logger.info("Generation successful.")
+            else:
+                logger.info("Generation failed. Adjusting options and retrying...")
+                num_retries -= 1
+
+                options["seed"] = random.randint(0, 10000)
+                options["temperature"] += 0.1
+        except Exception as e:
+            logger.error(f"Error generating text: {e}")
+            num_retries -= 1
+    
+    if not generation_matches:
+        logger.error(f"Failed to generate text after {num_retries} attempts.")
+        return None
+    
+    return generation
+
 def generate_image_to_text(image, ollama_options, image_to_text_model_name):
     res = requests.get(image)
     blob = res.content
@@ -109,6 +159,11 @@ def generate_image_to_text(image, ollama_options, image_to_text_model_name):
             "image": list(blob),
             "prompt": "Generate a caption for this image",
             "max_tokens": 512,
+            "stream": False,
+            "seed": ollama_options.get("seed"),
+            "temperature": ollama_options.get("temperature"),
+            "top_k": ollama_options.get("top_k"),
+            "top_p": ollama_options.get("top_p"),
         }
         response = requests.post(url, headers=headers, json=payload, timeout=180)
         response.raise_for_status()  # Raise an HTTPError for bad responses

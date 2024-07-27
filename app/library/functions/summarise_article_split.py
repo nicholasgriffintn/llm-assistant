@@ -3,7 +3,7 @@ import random
 from alive_progress import alive_it
 from pathlib import Path
 
-from ..helpers import generate, check_summary, logger
+from ..helpers import generate_and_check, logger
 
 def summarise_article_split(article_text, article_name, ollama_options, model_name):
     """
@@ -35,40 +35,26 @@ def summarise_article_split(article_text, article_name, ollama_options, model_na
     logger.info(f"Split text into {len(splits)} chunks...")
 
     summaries = []
-    attempts = 0
 
     for i, split in enumerate(alive_it(splits)):
-        summary_ok = False
-        retries = 5
-        options = ollama_options.copy()
+        try:
+            summary = generate_and_check(
+                prompt_template.format(docs=split),
+                ollama_options,
+                model_name,
+                article_text
+            )
+            if summary:
+                summaries.append(summary)
+                logger.info(f"Chunk #{i} summary generated successfully.")
+                encoded_model_name = model_name.replace("/", "_").replace("@", "_")
+                Path(f"{article_name}.summary.{encoded_model_name}.chunk_{i}.md").write_text(summary, encoding="utf-8")
+            else:
+                logger.error(f"Failed to generate summary for chunk #{i} after multiple attempts.")
 
-        while not summary_ok and retries > 0:
-            attempts += 1
-            try:
-                summary = generate(
-                    prompt_template.format(docs=split),
-                    options,
-                    model_name
-                )
-                summary_ok = check_summary(summary, article_text)
-                if summary_ok:
-                    summaries.append(summary)
-                    logger.info(f"Chunk #{i} summary generated successfully.")
-                    encoded_model_name = model_name.replace("/", "_").replace("@", "_")
-                    Path(f"{article_name}.summary.{encoded_model_name}.chunk_{i}.md").write_text(summary, encoding="utf-8")
-                else:
-                    logger.warning(f"Chunk #{i} summary failed. Retries left: {retries - 1}...")
-                    retries -= 1
-                    options["seed"] = random.randint(0, 10000)
-                    options["temperature"] += 0.1
-            except Exception as e:
-                logger.error(f"Error generating summary for chunk #{i}: {e}")
-                retries -= 1
+        except Exception as e:
+            logger.error(f"Error generating summary for chunk #{i}: {e}")
 
-        if not summary_ok:
-            logger.error(f"Failed to generate summary for chunk #{i} after multiple attempts.")
-            return
-
-    logger.info(f"Finished. Generated summaries for {len(splits)} chunks in {attempts} total attempts.")
+    logger.info(f"Finished. Generated summaries for {len(splits)} chunks.")
 
     return summaries
