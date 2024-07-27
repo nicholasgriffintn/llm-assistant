@@ -6,12 +6,15 @@ Use “Article” and only “Article” to summarise the article. Do not embell
 {docs}
 
 ### Instructions ###:
-1. Read the article carefully and take note of the main topics and subjects covered.
-2. Identify the 5-7 most important findings and insights present in “Article”.
-3. Find 1-2 illustrative quotes for each key finding.
-4. Provide any other relevant context or inferences you can make based on the article content.
-5. Format your summary in clear paragraphs with headings for each section. Use Markdown format.
-6. Your summary should be 200-300 words long.
+1. Read the "Article" carefully and take note of the main topics and subjects covered.
+2. Your report must include the following:
+2a. A brief introduction to the "Article".
+2b. The 6-10 key findings and insights from the "Article".
+2c. 1-2 illustrative quotes for each key finding.
+2d. Any other relevant context or inferences you can make based on the "Article" content.
+2e. A selection of subkect keywords that can be used for content tagging of the "Article".
+3. Format your summary in clear paragraphs with headings for each section. Use Markdown format.
+4. Your summary should be 200-300 words long.
 
 [/INST]
 
