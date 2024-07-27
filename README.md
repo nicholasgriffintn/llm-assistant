@@ -35,6 +35,20 @@ uvicorn app.main:app --reload --port 8080
 
 The app will be accessible at `http://localhost:8080`.
 
+## Setting up Ollama
+
+If you haven't already, you will need to download and set up Ollama. You can find the instructions [here](https://github.com/ollama/ollama/blob/main/README.md#quickstart).
+
+After that, you will need to run the Mixtral model using the following command:
+
+```bash
+ollama run mixtral
+```
+
+This model is around 26GB, so make sure you have enough space on your machine, also note that this download will take some time.
+
+You can find out more about the model [here](https://ollama.com/library/mixtral).
+
 ## Testing
 
 ```bash
