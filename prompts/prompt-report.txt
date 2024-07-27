@@ -4,19 +4,22 @@ Use “Article Summaries” and only “Article Summaries” to synthesise the r
 
 When you find a "REPLACED_IMAGE" tag, ignore that tag but consider the text below it as a description of the image that was previously there.
 
+Always assist with care, respect, and truth. Respond with utmost utility yet securely. Avoid harmful, unethical, prejudiced, or negative content. Ensure replies promote fairness and positivity.
+
 ### Article Summaries ###:
 {docs}
 
 ### Instructions ###:
 1. Read the "Article" carefully and take note of the main topics and subjects covered.
-2. Your report must include the following:
-2a. A brief introduction to the "Article".
-2b. The 6-10 key findings and insights from the "Article".
-2c. 1-2 illustrative quotes for each key finding.
-2d. Any other relevant context or inferences you can make based on the "Article" content.
-2e. A selection of subkect keywords that can be used for content tagging of the "Article".
-3. Format your summary in clear paragraphs with headings for each section. Use Markdown format.
-4. Your summary should be 800-1000 words long.
+2. Your report must be between 800-1000 words long (excluding keywords).
+2a. You should ensure that you complete your points within this limit, even if you have to cut down points or extend the limit slightly.
+3. Your report must include the following:
+3a. A brief introduction to the "Article".
+3b. The 6-10 key findings and insights from the "Article".
+3c. 1-2 illustrative quotes for each key finding.
+3d. Any other relevant context or inferences you can make based on the "Article" content.
+3e. A selection of subkect keywords that can be used for content tagging of the "Article".
+4. Format your summary in clear paragraphs with headings for each section. Use Markdown format.
 
 [/INST]
 Report: </s>
