@@ -51,6 +51,5 @@ def summarise_article( source, ollama_options, model_name ):
 
     summary_check = check_summary(generated, article_text)
     logger.info(f"Overall summary passes check? {summary_check}")
-    print(f"Overall summary passes check? {summary_check}")
 
     return generated

@@ -1,4 +1,4 @@
-model_name = "mixtral"
+model_name = "mistral-nemo"
 
 ollama_options = {
     "seed": 42,
