@@ -49,6 +49,14 @@ This model is around 26GB, so make sure you have enough space on your machine, a
 
 You can find out more about the model [here](https://ollama.com/library/mixtral).
 
+If you would like to configure the model used or change the configuration, you can do so by editing the `app/library/config.py` file.
+
+## Prompt Engineering
+
+The AI functions use a number of prompts to generate responses. These prompts are stored in the `prompts` folder as text files. You can add, remove or edit these prompts to change the behavior of the AI.
+
+If you'd like to learn more about prompt engineering, you can read [this documentation](https://www.promptingguide.ai/models/mixtral) which talks about how to format prompts for mixtral (which we are using) and other models.
+
 ## Testing
 
 ```bash
