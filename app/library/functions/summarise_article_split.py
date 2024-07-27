@@ -42,7 +42,8 @@ def summarise_article_split(source, article_text, prompt_template, ollama_option
                 if summary_ok:
                     summaries.append(summary)
                     logger.info(f"Chunk #{i} summary generated successfully.")
-                    Path(f"{source}.summary.{model_name}.{i}.md").write_text(summary, encoding="utf-8")
+                    encoded_model_name = model_name.replace("/", "_").replace("@", "_")
+                    Path(f"{source}.summary.{encoded_model_name}.{i}.md").write_text(summary, encoding="utf-8")
                 else:
                     logger.warning(f"Chunk #{i} summary failed. Retries left: {retries - 1}...")
                     retries -= 1

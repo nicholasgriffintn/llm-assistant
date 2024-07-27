@@ -5,7 +5,7 @@ import logging
 import re
 import string
 
-from .config import ollama_host
+from .config import ollama_host, use_cloudflare, cloudflare_api_token, cloudflare_host, cloudflare_account_id
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -49,18 +49,49 @@ def generate(prompt, options, model_name):
         str: The generated text.
     """
 
-    url = f"{ollama_host}/api/generate"
-    payload = {
-        "prompt": prompt,
-        "model": model_name,
-        "stream": False,
-        "options": options
-    }
+    if use_cloudflare:
+        if cloudflare_api_token is None or cloudflare_host is None or cloudflare_account_id is None:
+            logger.error("Cloudflare API key, host, or account ID not set.")
+            return None
+        
+        url = f"{cloudflare_host}/client/v4/accounts/{cloudflare_account_id}/ai/run/{model_name}"
+        headers = {
+            "Authorization": f"Bearer {cloudflare_api_token}",
+        }
+        inputs = [
+            { "role": "user", "content": prompt }
+        ];
+        payload = {
+            "messages": inputs
+        }
+    else:
+        url = f"{ollama_host}/api/generate"
+        headers = {}
+        payload = {
+            "prompt": prompt,
+            "model": model_name,
+            "stream": False,
+            "options": options
+        }
     
     try:
-        response = requests.post(url, json=payload, timeout=180)
+        print(f"Requesting generation from {url}...")
+        response = requests.post(url, headers=headers, json=payload, timeout=180)
         response.raise_for_status()  # Raise an HTTPError for bad responses
-        return response.json().get("response")
+        print(f"Response: {response.json()}")
+        if use_cloudflare:
+            responseJson = response.json()
+            result = responseJson.get("result")
+            if result is None:
+                logger.error("No response from server")
+                return None
+            success = responseJson.get("success")
+            if success is not True:
+                logger.error("Request failed")
+                return None
+            return result.get("response")
+        else:
+            return response.json().get("response")
     except requests.exceptions.Timeout:
         logger.error("Request timed out")
     except requests.exceptions.RequestException as e:

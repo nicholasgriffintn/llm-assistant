@@ -49,7 +49,15 @@ This model is around 26GB, so make sure you have enough space on your machine, a
 
 You can find out more about the model [here](https://ollama.com/library/mixtral-nemo).
 
-If you would like to configure the model used or change the configuration, you can do so by editing the `app/library/config.py` file.
+You can change the model being used by setting the `MODEL_NAME` environment variable.
+
+### Using CloudFlare
+
+If you'd like to use CloudFlare's AI service to generate responses instead, you can set the `USE_CLOUDFLARE` environment variable to `true`.
+
+You'll also need to set the `CLOUDFLARE_API_TOKEN` environment variable to your CloudFlare API token and the `CLOUDFLARE_ACCOUNT_ID` environment variable to your CloudFlare account ID.
+
+You can find out more about CloudFlare's AI service [here](https://developers.cloudflare.com/ai/). 
 
 ## Prompt Engineering
 

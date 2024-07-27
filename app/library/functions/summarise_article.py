@@ -42,7 +42,8 @@ def summarise_article( source, ollama_options, model_name ):
             logger.error(f"Error generating summary: {e}")
             return
     
-    output_path = Path(f"{source}.summary.{model_name}.md")
+    encoded_model_name = model_name.replace("/", "_").replace("@", "_")
+    output_path = Path(f"{source}.summary.{encoded_model_name}.md")
     try:
         output_path.write_text(generated, encoding="utf-8")
     except IOError as e:
