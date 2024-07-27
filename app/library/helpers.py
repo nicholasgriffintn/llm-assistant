@@ -75,10 +75,9 @@ def generate(prompt, options, model_name):
         }
     
     try:
-        print(f"Requesting generation from {url}...")
+        logger.info(f"Requesting generation from {url}...")
         response = requests.post(url, headers=headers, json=payload, timeout=180)
         response.raise_for_status()  # Raise an HTTPError for bad responses
-        print(f"Response: {response.json()}")
         if use_cloudflare:
             responseJson = response.json()
             result = responseJson.get("result")

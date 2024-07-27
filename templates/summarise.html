@@ -10,18 +10,33 @@
 {% endblock %}
 
 {% block page_content %}
-<h1 class="cap">Summarise Content</h1>
-{% if message %}
-{{ message }}
-{% endif %}
-{% if result %}
-<h2>The result is {{result}}.</h2>
-{% endif %}
-<h3>Submit Request</h3>
-<form action="/summarise" method="post">
-  <input type="text" name="query" value="" required />
-  <input type="submit">
-</form>
+<main role="main" class="container">
+  <div class="row">
+    <div class="col">
+      <h1>Summarise Content</h1>
+      {% if message %}
+      {{ message }}
+      {% endif %}
+      {% if result %}
+      <h2>The result is {{result}}.</h2>
+      {% endif %}
+      <h3>Submit Request</h3>
+      <form action="/summarise" method="post">
+        <label for="query">Enter the file location or the text you want to summarise:</label>
+        <textarea name="query" required></textarea>
+        <label for="should_chunk">
+          Should the text be chunked?
+          <input type="checkbox" name="should_chunk" />
+        </label>
+        <label for="compare">
+          Compare chunked with the un chunked response? (Requires chunked)
+          <input type="checkbox" name="compare" />
+        </label>
+        <input type="submit" />
+        </form>
+    </div>
+    </div>
+    </main>
 
 
 {% endblock %}

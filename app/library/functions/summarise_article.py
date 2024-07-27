@@ -1,31 +1,29 @@
 from pathlib import Path
 from alive_progress import alive_bar
-from  pathvalidate import is_valid_filepath
-import requests
 
 from ..helpers import generate, check_summary, logger, generate_image_to_text
 
-def summarise_article( source, ollama_options, model_name, image_to_text_model_name ):
+def summarise_article( article_text, article_name, ollama_options, model_name, image_to_text_model_name ):
     """
     Summarise a text file using the LLM.
     
     Args:
-        source (str): The name of the file to summarise.
+        article_text (str): The text of the article to summarise.
+        article_name (str): The name of the article.
         ollama_options (dict): The options to use for generation.
         model_name (str): The model to use for generation.
     """
 
+    logger.info(f"Summarising article: {article_name}")
+
+    prompt_template_path = Path("prompts/prompt-summary.txt")
     try:
-        if is_valid_filepath(source):
-            article_text = Path(source).read_text(encoding="utf-8")
-        else:
-            article_text = source
-        prompt_template = Path("prompts/prompt-summary.txt").read_text(encoding="utf-8")
-    except FileNotFoundError as e:
-        logger.error(f"File not found: {e}")
+        prompt_template = prompt_template_path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        logger.error(f"Template file not found: {prompt_template_path}")
         return
     except IOError as e:
-        logger.error(f"Error reading file: {e}")
+        logger.error(f"Error reading template file: {e}")
         return
     
     # Get the images in the article_text
@@ -37,7 +35,7 @@ def summarise_article( source, ollama_options, model_name, image_to_text_model_n
     
     if len(images) > 0:
         with alive_bar() as bar:
-            print("Images found in article. Using image-to-text model to convert images to text.")
+            logger.info("Images found in article. Using image-to-text model to convert images to text.")
             try:
                 for image in images:
                     response = generate_image_to_text(image, ollama_options, image_to_text_model_name)
@@ -64,7 +62,7 @@ def summarise_article( source, ollama_options, model_name, image_to_text_model_n
             return
     
     encoded_model_name = model_name.replace("/", "_").replace("@", "_")
-    output_path = Path(f"{source}.summary.{encoded_model_name}.md")
+    output_path = Path(f"{article_name}.summary.{encoded_model_name}.md")
     try:
         output_path.write_text(generated, encoding="utf-8")
     except IOError as e:
