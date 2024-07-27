@@ -101,17 +101,17 @@ def generate(prompt, options, model_name):
 def generate_image_to_text(image, ollama_options, image_to_text_model_name):
     res = requests.get(image)
     blob = res.content
-    input_data = {
-        "image": list(blob),
-        "prompt": "Generate a caption for this image",
-        "max_tokens": 512,
-    }
     if use_cloudflare:
         url = f"{cloudflare_host}/client/v4/accounts/{cloudflare_account_id}/ai/run/{image_to_text_model_name}"
         headers = {
             "Authorization": f"Bearer {cloudflare_api_token}",
         }
-        response = requests.post(url, headers=headers, json=input_data, timeout=180)
+        payload = {
+            "image": list(blob),
+            "prompt": "Generate a caption for this image",
+            "max_tokens": 512,
+        }
+        response = requests.post(url, headers=headers, json=payload, timeout=180)
         response.raise_for_status()  # Raise an HTTPError for bad responses
         responseJson = response.json()
         result = responseJson.get("result")
@@ -127,11 +127,11 @@ def generate_image_to_text(image, ollama_options, image_to_text_model_name):
         url = f"{ollama_host}/api/generate"
         headers = {}
         payload = {
-            "prompt": input_data["prompt"],
+            "prompt": "Generate a caption for this image",
             "model": image_to_text_model_name,
             "stream": False,
             "options": ollama_options,
-            "inputs": input_data
+            "images": [blob]
         }
         response = requests.post(url, headers=headers, json=payload, timeout=180)
         response.raise_for_status()
