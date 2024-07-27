@@ -7,7 +7,7 @@ from  pathvalidate import is_valid_filepath
 from pathlib import Path
 import datetime
 
-def get_data( source ):
+def get_data(source):
     """
     Get the data from the source, either a file or text.
 
@@ -17,9 +17,17 @@ def get_data( source ):
     Returns:
         str: The article text.
     """
-
     try:
-        if is_valid_filepath(source):
+        if ',' in source:
+            file_paths = source.split(',')
+            article_texts = []
+            for file_path in file_paths:
+                if is_valid_filepath(file_path.strip()):
+                    article_texts.append(Path(file_path.strip()).read_text(encoding="utf-8"))
+                else:
+                    article_texts.append(file_path.strip())
+            return article_texts
+        elif is_valid_filepath(source):
             article_text = Path(source).read_text(encoding="utf-8")
         else:
             article_text = source
@@ -32,7 +40,7 @@ def get_data( source ):
     
     return article_text
 
-def get_data_name( source ):
+def get_data_name(source):
     """
     Generate a name for the data source.
 
@@ -42,11 +50,15 @@ def get_data_name( source ):
     Returns:
         str: The name of the data source.
     """
-
-    if is_valid_filepath(source):
+    if ',' in source:
+        file_paths = source.split(',')
+        names = [Path(file_path.strip()).stem for file_path in file_paths if is_valid_filepath(file_path.strip())]
+        path = "_".join(names)
+        return f"data/compare/{path}"
+    elif is_valid_filepath(source):
         return source
     else:
-        date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        date_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         return f"data/article_{date_time}"
 
 def summarise( source, should_chunk=False, compare=False ):
@@ -66,8 +78,21 @@ def summarise( source, should_chunk=False, compare=False ):
             return
         
         article_name = get_data_name( source )
+        
+        if isinstance(article_text, list):
+            summaries = []
+            for i, text in enumerate(article_text):
+                summary = summarise_article( text, f"{article_name}_{i}", ollama_options, model_name, image_to_text_model_name )
+                if summary is None:
+                    return ""
+                summaries.append(summary)
 
-        if should_chunk and compare:
+            if compare:
+                report = summarise_articles( article_name, summaries, ollama_options, model_name )
+                return report
+
+            return "\n\n".join(summaries)
+        elif should_chunk and compare:
             summary_one = summarise_article( article_text, article_name, ollama_options, model_name, image_to_text_model_name )
             if summary_one is None:
                 return ""
