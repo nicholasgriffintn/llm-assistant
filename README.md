@@ -15,6 +15,9 @@ The goal of this project is to develop an advanced assistant using the Large Lan
 - FastAPI
 - Langschain
 - Mixtral
+- LLava
+- Ollama
+- CloudFlare
 
 ## Setup
 
@@ -73,7 +76,7 @@ You can find out more about CloudFlare's AI service [here](https://developers.cl
 
 ### CloudFlare Models
 
-On CloudFlare, I have been using the `@cf/mistral/mistral-7b-instruct-v0.1` as a replacement for the `mistral-nemo` model and `@cf/llava-hf/llava-1.5-7b-hf` as a replacement for the `llava` model.
+On CloudFlare, I have been using `@cf/mistral/mistral-7b-instruct-v0.1` as a replacement for the `mistral-nemo` model and `@cf/llava-hf/llava-1.5-7b-hf` as a replacement for the `llava` model.
 
 ## Prompt Engineering
 
