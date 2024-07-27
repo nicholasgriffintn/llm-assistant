@@ -3,12 +3,12 @@ from alive_progress import alive_bar
 
 from ..helpers import generate, check_summary, logger
 
-def summarise_articles(article_name, summaries, ollama_options, model_name):
+def summarise_articles(source, summaries, ollama_options, model_name):
     """
     Summarise multiple articles and generate a combined report.
 
     Args:
-        article_name (str): The name of the article.
+        source (str): The name of the article.
         summaries (list): List of summaries to combine.
         ollama_options (dict): Options for the ollama model.
         model_name (str): The name of the model to use.
@@ -39,7 +39,7 @@ def summarise_articles(article_name, summaries, ollama_options, model_name):
                 )
                 report_ok = check_summary(report, combined_summaries)
                 if report_ok:
-                    output_path = Path(f"app/pages/{article_name}.report.{model_name}.md")
+                    output_path = Path(f"app/pages/{source}.report.{model_name}.md")
                     output_path.write_text(report, encoding="utf-8")
                     logger.info(f"Report successfully generated and saved to {output_path}")
                 else:

@@ -1,20 +1,24 @@
 from pathlib import Path
 from alive_progress import alive_bar
+from  pathvalidate import is_valid_filepath
 
 from ..helpers import generate, check_summary, logger
 
-def summarise_article( article_name, ollama_options, model_name ):
+def summarise_article( source, ollama_options, model_name ):
     """
     Summarise a text file using the LLM.
     
     Args:
-        article_name (str): The name of the file to summarise.
+        source (str): The name of the file to summarise.
         ollama_options (dict): The options to use for generation.
         model_name (str): The model to use for generation.
     """
 
     try:
-        article_text = Path(f"data/{article_name}").read_text(encoding="utf-8")
+        if is_valid_filepath(source):
+            article_text = Path(source).read_text(encoding="utf-8")
+        else:
+            article_text = source
         prompt_template = Path("prompts/prompt-summary.txt").read_text(encoding="utf-8")
     except FileNotFoundError as e:
         logger.error(f"File not found: {e}")
@@ -38,7 +42,7 @@ def summarise_article( article_name, ollama_options, model_name ):
             logger.error(f"Error generating summary: {e}")
             return
     
-    output_path = Path(f"app/pages/{article_name}.summary.{model_name}.md")
+    output_path = Path(f"app/pages/{source}.summary.{model_name}.md")
     try:
         output_path.write_text(generated, encoding="utf-8")
     except IOError as e:

@@ -5,12 +5,12 @@ from pathlib import Path
 
 from ..helpers import generate, check_summary, logger
 
-def summarise_article_split(article_name, article_text, prompt_template, ollama_options, model_name):
+def summarise_article_split(source, article_text, prompt_template, ollama_options, model_name):
     """
     Summarise an article by splitting it into smaller chunks and recursively summarising those chunks.
 
     Args:
-        article_name (str): The name of the article.
+        source (str): The name of the article.
         article_text (str): The text of the article.
         prompt_template (str): The template for the prompt.
         ollama_options (dict): Options for the ollama model.
@@ -42,7 +42,7 @@ def summarise_article_split(article_name, article_text, prompt_template, ollama_
                 if summary_ok:
                     summaries.append(summary)
                     logger.info(f"Chunk #{i} summary generated successfully.")
-                    Path(f"app/pages/{article_name}.summary.{model_name}.{i}.md").write_text(summary, encoding="utf-8")
+                    Path(f"app/pages/{source}.summary.{model_name}.{i}.md").write_text(summary, encoding="utf-8")
                 else:
                     logger.warning(f"Chunk #{i} summary failed. Retries left: {retries - 1}...")
                     retries -= 1

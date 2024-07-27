@@ -58,7 +58,7 @@ def generate(prompt, options, model_name):
     }
     
     try:
-        response = requests.post(url, json=payload, timeout=120)
+        response = requests.post(url, json=payload, timeout=180)
         response.raise_for_status()  # Raise an HTTPError for bad responses
         return response.json().get("response")
     except requests.exceptions.Timeout:
