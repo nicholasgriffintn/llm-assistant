@@ -13,8 +13,8 @@ The goal of this project is to develop an advanced assistant using the Large Lan
 
 - Python
 - FastAPI
-- Langschain
-- Mixtral
+- Langchain
+- Mistral (mistral-nemo and mistral-7b-instruct)
 - LLava
 - Ollama
 - CloudFlare
@@ -48,7 +48,7 @@ After that, you will need to run the Mixtral model using the following command:
 ollama pull mistral-nemo
 ```
 
-This model is around 26GB, so make sure you have enough space on your machine, also note that this download will take some time.
+This model is around 7GB, so make sure you have enough space on your machine, also note that this download will take some time.
 
 You can find out more about the model [here](https://ollama.com/library/mixtral-nemo).
 
