@@ -1,10 +1,11 @@
 from pathlib import Path
 from alive_progress import alive_bar
 from  pathvalidate import is_valid_filepath
+import requests
 
-from ..helpers import generate, check_summary, logger
+from ..helpers import generate, check_summary, logger, generate_image_to_text
 
-def summarise_article( source, ollama_options, model_name ):
+def summarise_article( source, ollama_options, model_name, image_to_text_model_name ):
     """
     Summarise a text file using the LLM.
     
@@ -26,6 +27,26 @@ def summarise_article( source, ollama_options, model_name ):
     except IOError as e:
         logger.error(f"Error reading file: {e}")
         return
+    
+    # Get the images in the article_text
+    images = []
+    for line in article_text.split("\n"):
+        if line.startswith("!"):
+            imageURL = line.split("(")[1].split(")")[0]
+            images.append(imageURL)
+    
+    if len(images) > 0:
+        with alive_bar() as bar:
+            print("Images found in article. Using image-to-text model to convert images to text.")
+            try:
+                for image in images:
+                    response = generate_image_to_text(image, ollama_options, image_to_text_model_name)
+                    if response is not None:
+                        # Replace the line that contains the image with the generated text
+                        article_text = article_text.replace(f"![]({image})", f"### REPLACED_IMAGE ###\n{response}")
+                bar()
+            except Exception as e:
+                logger.error(f"Error summarising image: {e}")
 
     generated = None
     with alive_bar() as bar:

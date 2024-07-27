@@ -1,6 +1,7 @@
 import os
 
 model_name = os.getenv("MODEL_NAME", "mistral-nemo")
+image_to_text_model_name = os.getenv("IMAGE_TO_TEXT_MODEL_NAME", "llava")
 
 ollama_options = {
     "seed": 42,

@@ -2,6 +2,8 @@
 
 Use “Article Summaries” and only “Article Summaries” to synthesise the report. Do not embellish or add detail to “Article Summaries”.
 
+When you find a "REPLACED_IMAGE" tag, ignore that tag but consider the text below it as a description of the image that was previously there.
+
 ### Article Summaries ###:
 {docs}
 

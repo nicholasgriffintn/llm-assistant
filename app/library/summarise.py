@@ -1,4 +1,4 @@
-from .config import model_name, ollama_options
+from .config import model_name, ollama_options, image_to_text_model_name
 from .helpers import logger
 from .functions.summarise_article import summarise_article
 from .functions.summarise_article_split import summarise_article_split
@@ -16,7 +16,7 @@ def summarise( source ):
     """
 
     try:
-        summary = summarise_article( source, ollama_options, model_name )
+        summary = summarise_article( source, ollama_options, model_name, image_to_text_model_name )
 
         if summary is None:
             return ""

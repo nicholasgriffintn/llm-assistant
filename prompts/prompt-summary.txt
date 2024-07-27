@@ -2,6 +2,8 @@
 
 Use “Article” and only “Article” to summarise the article. Do not embellish or add detail to “Article”.
 
+When you find a "REPLACED_IMAGE" tag, ignore that tag but consider the text below it as a description of the image that was previously there.
+
 ### Article ###:
 {docs}
 
