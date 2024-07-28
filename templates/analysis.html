@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% set active_page = "summarise" %}
+
+{% block title %}Summarise Content{% endblock %}
+
+{% block head %}
+{{ super() }}
+
+
+{% endblock %}
+
+{% block page_content %}
+<main role="main" class="container">
+  <div class="row">
+    <div class="col">
+      <h1>Analyze Content</h1>
+      {% if message %}
+      {{ message }}
+      {% endif %}
+      {% if result %}
+      <h2>The result is {{result}}.</h2>
+      {% endif %}
+      <h3>Submit Request</h3>
+      <form action="/analysis" method="post">
+        <label for="query">Enter the file location or the text you want to analyze:</label>
+        <textarea name="query" required></textarea>
+        <input type="submit" />
+      </form>
+    </div>
+  </div>
+</main>
+
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+
+{% endblock %}

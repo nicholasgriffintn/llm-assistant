@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from .library.helpers import *
-from app.routers import summarise
+from app.routers import summarise, analysis
 
 
 app = FastAPI()
@@ -15,6 +15,7 @@ templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.include_router(summarise.router)
+app.include_router(analysis.router)
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
