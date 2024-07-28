@@ -6,3 +6,4 @@ More should be coming soon!
 
 - [Summarise Content](/summarise)
 - [Analyse Content](/analysis)
+- [Answer Questions](/question)
