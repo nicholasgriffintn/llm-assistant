@@ -1,4 +1,4 @@
-from .config import model_name, ollama_options, image_to_text_model_name
+from .config import model_name, ollama_options
 from .helpers import logger
 from .functions.answer_question import answer_question
 
@@ -18,12 +18,12 @@ def chatbot( source ):
         if question is None:
             return
         
-        analysis = answer_question( question, ollama_options, model_name )
+        response = answer_question( question, ollama_options, model_name, should_stream=True )
 
-        if analysis is None:
+        if response is None:
             return ""
         
-        return analysis
+        return response
     except Exception as e:
         logger.error(f"Error answering question: {e}")
         return

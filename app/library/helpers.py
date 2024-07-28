@@ -37,7 +37,7 @@ def openfile(filename):
     html = markdown.markdown(text)
     return {"text": html}
 
-def post_generate_request(url, headers, payload):
+def post_generate_request(url, headers, payload, should_stream):
     """
     Make a POST request to the LLM API.
 
@@ -45,6 +45,7 @@ def post_generate_request(url, headers, payload):
         url (str): The URL to make the request to.
         headers (dict): The headers to include in the request.
         payload (dict): The payload to include in the request.
+        should_stream (bool): Whether to stream the response.
     
     Returns:
         dict: The response from the server.
@@ -53,7 +54,15 @@ def post_generate_request(url, headers, payload):
     try:
         response = requests.post(url, headers=headers, json=payload, timeout=180)
         response.raise_for_status()
-        return response.json()
+
+        if should_stream:
+            print("Streaming")
+            inference = response
+            return inference
+        else:
+            print("Not Streaming")
+            inference = response.json()
+            return inference
     except requests.RequestException as e:
         logger.error(f"Request failed: {e}")
         return None
@@ -99,9 +108,12 @@ def generate(prompt, options, model_name, should_stream=False):
             "options": options
         }
     
-    response_json = post_generate_request(url, headers, payload)
+    response_json = post_generate_request(url, headers, payload, should_stream)
     if not response_json:
         return None
+    
+    if should_stream:
+        return response_json
 
     if use_cloudflare:
         result = response_json.get("result")
