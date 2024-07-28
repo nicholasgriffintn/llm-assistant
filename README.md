@@ -6,8 +6,8 @@ The goal of this project is to develop an advanced assistant using the Large Lan
 ## Features
 
 - A frontend interface for users to interact with the assistant, manage the database and view past queries and responses.
-- A backend that leverages the Mixtral model and Ollama to generate responses to user queries (maybe Cloudflare in the future).
-- A database to store user queries and responses for future reference.
+- A backend that leverages the Mixtral model and Ollama/ Cloudflare AI to generate responses to user queries.
+- [ ] A database to store user queries and responses for future reference. (maybe in the future).
 
 ## Technologies
 
@@ -72,7 +72,7 @@ If you'd like to use Cloudflare's AI service to generate responses instead, you 
 
 You'll also need to set the `CLOUDFLARE_API_TOKEN` environment variable to your Cloudflare API token and the `CLOUDFLARE_ACCOUNT_ID` environment variable to your Cloudflare account ID.
 
-You can find out more about Cloudflare's AI service [here](https://developers.Cloudflare.com/ai/).
+You can find out more about Cloudflare's AI service [here](https://developers.cloudflare.com/ai/).
 
 ### Cloudflare Models
 
