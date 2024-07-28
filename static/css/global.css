@@ -1,0 +1,5 @@
+pre {
+  word-wrap: break-word;
+  font-size: 1rem;
+  white-space: pre-wrap;
+}
