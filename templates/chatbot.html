@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% set active_page = "chatbot" %}
+
+{% block title %}Chatbot{% endblock %}
+
+{% block head %}
+{{ super() }}
+
+
+{% endblock %}
+
+{% block page_content %}
+<main role="main" class="container">
+  <div class="row">
+    <div class="col">
+      <h1>Chatbot</h1>
+      <ul id="messages"></ul>
+      <form action="" onsubmit="sendMessage(event)">
+        <input type="text" id="messageText" autocomplete="off" />
+        <button>Send</button>
+      </form>
+    </div>
+  </div>
+</main>
+
+<script>
+  var ws = new WebSocket(`ws://localhost:8080/chatbot/ws`);
+  console.log("Connected")
+  ws.onmessage = function (event) {
+    var messages = document.getElementById('messages')
+    var message = document.createElement('li')
+    var content = document.createTextNode(event.data)
+    message.appendChild(content)
+    messages.appendChild(message)
+  };
+  console.log("Send Message")
+  function sendMessage(event) {
+    var input = document.getElementById("messageText")
+    ws.send(input.value)
+    input.value = ''
+    event.preventDefault()
+  }
+</script>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+
+{% endblock %}

@@ -58,7 +58,7 @@ def post_generate_request(url, headers, payload):
         logger.error(f"Request failed: {e}")
         return None
 
-def generate(prompt, options, model_name):
+def generate(prompt, options, model_name, should_stream=False):
     """
     Generate text using the Ollama API.
 
@@ -66,6 +66,7 @@ def generate(prompt, options, model_name):
         prompt (str): The prompt to generate text from.
         options (dict): The options to use for generation.
         model_name (str): The model to use for generation.
+        should_stream (bool): Whether to stream the response.
 
     Returns:
         str: The generated text.
@@ -82,7 +83,7 @@ def generate(prompt, options, model_name):
         }
         payload = {
             "prompt": prompt,
-            "stream": False,
+            "stream": should_stream,
             "seed": options.get("seed"),
             "temperature": options.get("temperature"),
             "top_k": options.get("top_k"),
@@ -94,7 +95,7 @@ def generate(prompt, options, model_name):
         payload = {
             "prompt": prompt,
             "model": model_name,
-            "stream": False,
+            "stream": should_stream,
             "options": options
         }
     

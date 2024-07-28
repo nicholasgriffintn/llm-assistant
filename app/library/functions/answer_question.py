@@ -3,7 +3,7 @@ from alive_progress import alive_bar
 
 from ..helpers import generate, logger
 
-def answer_question( question, ollama_options, model_name ):
+def answer_question( question, ollama_options, model_name, should_stream=False ):
     """
     Answer a question using the LLM.
     
@@ -11,6 +11,7 @@ def answer_question( question, ollama_options, model_name ):
         question (str): The question to answer.
         ollama_options (dict): The options to use for generation.
         model_name (str): The model to use for generation.
+        should_stream (bool): Whether to stream the response.
     """
 
     logger.info(f"Answering question: {question}")
@@ -33,7 +34,8 @@ def answer_question( question, ollama_options, model_name ):
                     question = question
                 ),
                 ollama_options,
-                model_name
+                model_name,
+                should_stream
             )
             bar()
         except Exception as e:
