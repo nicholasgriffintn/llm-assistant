@@ -18,7 +18,7 @@ def get_data(source):
         str: The article text.
     """
     try:
-        if ',' in source:
+        if ',' in source and ' ' not in source:
             file_paths = source.split(',')
             article_texts = []
             for file_path in file_paths:
@@ -50,7 +50,7 @@ def get_data_name(source):
     Returns:
         str: The name of the data source.
     """
-    if ',' in source:
+    if ',' in source and ' ' not in source:
         file_paths = source.split(',')
         names = [Path(file_path.strip()).stem for file_path in file_paths if is_valid_filepath(file_path.strip())]
         path = "_".join(names)
@@ -61,7 +61,7 @@ def get_data_name(source):
         date_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         return f"data/article_{date_time}"
 
-def summarise( source, should_chunk=False, compare=False ):
+def summarise(source, should_chunk=False, compare=False):
     """
     Summarise an article using the Ollama API.
 
@@ -71,48 +71,63 @@ def summarise( source, should_chunk=False, compare=False ):
     Returns:
         str: The summary of the article.
     """
-
     try:
-        article_text = get_data( source )
+        article_text = get_data(source)
         if article_text is None:
             return
-        
-        article_name = get_data_name( source )
-        
+
+        article_name = get_data_name(source)
+
         if isinstance(article_text, list):
-            summaries = []
-            for i, text in enumerate(article_text):
-                summary = summarise_article( text, f"{article_name}_{i}", ollama_options, model_name, image_to_text_model_name )
-                if summary is None:
-                    return ""
-                summaries.append(summary)
-
-            if compare:
-                report = summarise_articles( article_name, summaries, ollama_options, model_name )
-                return report
-
-            return "\n\n".join(summaries)
+            return handle_list_articles(article_text, article_name, compare)
         elif should_chunk and compare:
-            summary_one = summarise_article( article_text, article_name, ollama_options, model_name, image_to_text_model_name )
-            if summary_one is None:
-                return ""
-            summary_split = summarise_article_split( article_text, article_name, ollama_options, model_name )
-            if summary_split is None:
-                return ""
-            summary_two = summarise_articles( article_name, summary_split, ollama_options, model_name )
-            if summary_two is None:
-                return ""
-
-            summary = f"{summary_one}\n\n{summary_two}"
+            return handle_chunk_and_compare(article_text, article_name)
         elif should_chunk:
-            summary = summarise_article_split( article_text, article_name, ollama_options, model_name )
+            return handle_chunk(article_text, article_name)
         else:
-            summary = summarise_article( article_text, article_name, ollama_options, model_name, image_to_text_model_name )
-
-        if summary is None:
-            return ""
-        
-        return summary
+            return handle_single_article(article_text, article_name)
     except Exception as e:
         logger.error(f"Error summarising article: {e}")
         return
+
+
+def handle_list_articles(article_text, article_name, compare):
+    summaries = []
+    for i, text in enumerate(article_text):
+        summary = summarise_article(text, f"{article_name}_{i}", ollama_options, model_name, image_to_text_model_name)
+        if summary is None:
+            return ""
+        summaries.append(summary)
+
+    if compare:
+        return summarise_articles(article_name, summaries, ollama_options, model_name)
+
+    return "\n\n".join(summaries)
+
+
+def handle_chunk_and_compare(article_text, article_name):
+    summary_one = summarise_article(article_text, article_name, ollama_options, model_name, image_to_text_model_name)
+    if summary_one is None:
+        return ""
+    summary_split = summarise_article_split(article_text, article_name, ollama_options, model_name)
+    if summary_split is None:
+        return ""
+    summary_two = summarise_articles(article_name, summary_split, ollama_options, model_name)
+    if summary_two is None:
+        return ""
+
+    return f"{summary_one}\n\n{summary_two}"
+
+
+def handle_chunk(article_text, article_name):
+    summary = summarise_article_split(article_text, article_name, ollama_options, model_name)
+    if summary is None:
+        return ""
+    return summary
+
+
+def handle_single_article(article_text, article_name):
+    summary = summarise_article(article_text, article_name, ollama_options, model_name, image_to_text_model_name)
+    if summary is None:
+        return ""
+    return summary
