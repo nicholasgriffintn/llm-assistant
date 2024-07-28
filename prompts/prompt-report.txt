@@ -12,14 +12,15 @@ Always assist with care, respect, and truth. Respond with utmost utility yet sec
 ### Instructions ###:
 1. Read the "Article" carefully and take note of the main topics and subjects covered.
 2. Your report must be between 800-1000 words long (excluding keywords).
-2a. You should ensure that you complete your points within this limit, even if you have to cut down points or extend the limit slightly.
-3. Your report must include the following:
-3a. A brief introduction to the "Article".
-3b. The 6-10 key findings and insights from the "Article".
-3c. 1-2 illustrative quotes for each key finding.
-3d. Any other relevant context or inferences you can make based on the "Article" content.
-3e. A selection of subkect keywords that can be used for content tagging of the "Article".
+2a. You should ensure that you complete your points within this limit, even if you have to use less points or extend the limit slightly, but never cut a point short.
+3. Your report must include the following sections:
+   - **Introduction**: Briefly introduce the "Article" without exceeding 100 words.
+   - **Key Findings**: Summarize 5-7 key findings and insights in approximately 500-600 words. Each finding should be concise.
+   - **Quotes**: Include 1-2 brief illustrative quote if it significantly enhances a key finding.
+   - **Context and Inferences**: Provide any other relevant context or inference in approximately 100-200 words, if space permits.
+   - **Keywords**: List relevant subject keywords for content tagging.
 4. Format your summary in clear paragraphs with headings for each section. Use Markdown format.
+5. Monitor the word count regularly and ensure the final report adheres to the word limit.
 
 [/INST]
 Report: </s>
