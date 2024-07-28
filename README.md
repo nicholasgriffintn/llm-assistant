@@ -6,7 +6,7 @@ The goal of this project is to develop an advanced assistant using the Large Lan
 ## Features
 
 - A frontend interface for users to interact with the assistant, manage the database and view past queries and responses.
-- A backend that leverages the Mixtral model and Ollama to generate responses to user queries (maybe CloudFlare in the future).
+- A backend that leverages the Mixtral model and Ollama to generate responses to user queries (maybe Cloudflare in the future).
 - A database to store user queries and responses for future reference.
 
 ## Technologies
@@ -17,7 +17,7 @@ The goal of this project is to develop an advanced assistant using the Large Lan
 - Mistral (mistral-nemo and mistral-7b-instruct)
 - LLava
 - Ollama
-- CloudFlare
+- Cloudflare
 
 ## Setup
 
@@ -66,17 +66,25 @@ ollama pull llava
 
 You can find out more about the model [here](https://ollama.com/library/llava).
 
-## Using CloudFlare
+## Using Cloudflare
 
-If you'd like to use CloudFlare's AI service to generate responses instead, you can set the `USE_CLOUDFLARE` environment variable to `true`.
+If you'd like to use Cloudflare's AI service to generate responses instead, you can set the `USE_CLOUDFLARE` environment variable to `true`.
 
-You'll also need to set the `CLOUDFLARE_API_TOKEN` environment variable to your CloudFlare API token and the `CLOUDFLARE_ACCOUNT_ID` environment variable to your CloudFlare account ID.
+You'll also need to set the `CLOUDFLARE_API_TOKEN` environment variable to your Cloudflare API token and the `CLOUDFLARE_ACCOUNT_ID` environment variable to your Cloudflare account ID.
 
-You can find out more about CloudFlare's AI service [here](https://developers.cloudflare.com/ai/).
+You can find out more about Cloudflare's AI service [here](https://developers.Cloudflare.com/ai/).
 
-### CloudFlare Models
+### Cloudflare Models
 
-On CloudFlare, I have been using `@cf/mistral/mistral-7b-instruct-v0.1` as a replacement for the `mistral-nemo` model and `@cf/llava-hf/llava-1.5-7b-hf` as a replacement for the `llava` model.
+On Cloudflare, I have been using `@cf/mistral/mistral-7b-instruct-v0.1` as a replacement for the `mistral-nemo` model and `@cf/llava-hf/llava-1.5-7b-hf` as a replacement for the `llava` model.
+
+### Cloudflare AI Gateway
+
+The Cloudflare AI Gateway is pretty cool, it allows you to track usage of CloudFlare AI, set rate limits for requests and, possibly the coolest thing, cache responses for a certain amount of time.
+
+You can find out more about the Cloudflare AI Gateway [here](https://developers.cloudflare.com/ai-gateway/).
+
+To use it, set the env variable `CLOUDFLARE_GATEWAY_ID` to the ID of your Cloudflare AI Gateway.
 
 ## Prompt Engineering
 

@@ -17,3 +17,9 @@ use_cloudflare = os.getenv("USE_CLOUDFLARE", "false") == "true"
 cloudflare_api_token = os.getenv("CLOUDFLARE_API_TOKEN")
 cloudflare_host = "https://api.cloudflare.com"
 cloudflare_account_id = os.getenv("CLOUDFLARE_ACCOUNT_ID")
+cloudflare_ai_endpoint = f"client/v4/accounts/{cloudflare_account_id}/ai/run"
+cloudflare_gateway_host = "https://gateway.ai.cloudflare.com"
+cloudflare_gateway_id = os.getenv("CLOUDFLARE_GATEWAY_ID")
+if cloudflare_gateway_id is not None:
+    cloudflare_host = cloudflare_gateway_host
+    cloudflare_ai_endpoint = f"v1/{cloudflare_account_id}/{cloudflare_gateway_id}/workers-ai"

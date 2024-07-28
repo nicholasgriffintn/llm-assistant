@@ -6,7 +6,7 @@ import re
 import string
 import random
 
-from .config import ollama_host, use_cloudflare, cloudflare_api_token, cloudflare_host, cloudflare_account_id
+from .config import ollama_host, use_cloudflare, cloudflare_api_token, cloudflare_host, cloudflare_account_id, cloudflare_ai_endpoint
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -72,11 +72,11 @@ def generate(prompt, options, model_name):
     """
 
     if use_cloudflare:
-        if not all([cloudflare_api_token, cloudflare_host, cloudflare_account_id]):
+        if not all([cloudflare_api_token, cloudflare_host, cloudflare_account_id, cloudflare_ai_endpoint]):
             logger.error("Cloudflare API key, host, or account ID not set.")
             return None
         
-        url = f"{cloudflare_host}/client/v4/accounts/{cloudflare_account_id}/ai/run/{model_name}"
+        url = f"{cloudflare_host}/{cloudflare_ai_endpoint}/{model_name}"
         headers = {
             "Authorization": f"Bearer {cloudflare_api_token}",
         }
