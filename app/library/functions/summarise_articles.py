@@ -1,7 +1,7 @@
 from pathlib import Path
 from alive_progress import alive_bar
 
-from ..helpers import generate_and_check, logger
+from ..helpers import generate_and_check, get_report_template, logger
 
 def summarise_articles(article_name, summaries, ollama_options, model_name):
     """
@@ -16,14 +16,9 @@ def summarise_articles(article_name, summaries, ollama_options, model_name):
 
     logger.info(f"Summarising articles into a report: {article_name}")
 
-    report_template_path = Path("prompts/prompt-report.txt")
-    try:
-        report_template = report_template_path.read_text(encoding="utf-8")
-    except FileNotFoundError:
-        logger.error(f"Template file not found: {report_template_path}")
-        return
-    except IOError as e:
-        logger.error(f"Error reading template file: {e}")
+    report_template = get_report_template("prompts/prompt-report.txt")
+
+    if not report_template:
         return
 
     combined_summaries = "###\n".join(summaries)

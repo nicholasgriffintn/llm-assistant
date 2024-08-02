@@ -1,7 +1,7 @@
 from pathlib import Path
 from alive_progress import alive_bar
 
-from ..helpers import generate_and_check, check_summary, logger, generate_image_to_text
+from ..helpers import generate_and_check, get_report_template, logger, generate_image_to_text
 
 def summarise_article( article_text, article_name, ollama_options, model_name, image_to_text_model_name ):
     """
@@ -16,14 +16,9 @@ def summarise_article( article_text, article_name, ollama_options, model_name, i
 
     logger.info(f"Summarising article: {article_name}")
 
-    prompt_template_path = Path("prompts/prompt-summary.txt")
-    try:
-        prompt_template = prompt_template_path.read_text(encoding="utf-8")
-    except FileNotFoundError:
-        logger.error(f"Template file not found: {prompt_template_path}")
-        return
-    except IOError as e:
-        logger.error(f"Error reading template file: {e}")
+    prompt_template = get_report_template("prompts/prompt-summary.txt")
+
+    if not prompt_template:
         return
     
     # Get the images in the article_text

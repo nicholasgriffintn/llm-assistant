@@ -3,7 +3,7 @@ import random
 from alive_progress import alive_it
 from pathlib import Path
 
-from ..helpers import generate_and_check, logger
+from ..helpers import generate_and_check, logger, get_report_template
 
 def summarise_article_split(article_text, article_name, ollama_options, model_name):
     """
@@ -18,14 +18,9 @@ def summarise_article_split(article_text, article_name, ollama_options, model_na
 
     logger.info(f"Summarising article by splitting: {article_name}")
 
-    prompt_template_path = Path("prompts/prompt-summary.txt")
-    try:
-        prompt_template = prompt_template_path.read_text(encoding="utf-8")
-    except FileNotFoundError:
-        logger.error(f"Template file not found: {prompt_template_path}")
-        return
-    except IOError as e:
-        logger.error(f"Error reading template file: {e}")
+    prompt_template = get_report_template("prompts/prompt-summary.txt")
+
+    if not prompt_template:
         return
     
     chunk_size = len(article_text) // 7  # or a fixed size, like 4096 or something

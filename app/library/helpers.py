@@ -5,6 +5,7 @@ import logging
 import re
 import string
 import random
+from pathlib import Path
 
 from .config import ollama_host, use_cloudflare, cloudflare_api_token, cloudflare_host, cloudflare_account_id, cloudflare_ai_endpoint
 
@@ -37,6 +38,25 @@ def openfile(filename):
     html = markdown.markdown(text)
     return {"text": html}
 
+def get_report_template(path):
+    """
+    Get the report template.
+
+    Returns:
+        str: The contents of the report template.
+    """
+
+    report_template_path = Path(path)
+    try:
+        report_template = report_template_path.read_text(encoding="utf-8")
+        return report_template
+    except FileNotFoundError:
+        logger.error(f"Template file not found: {report_template_path}")
+        return
+    except IOError as e:
+        logger.error(f"Error reading template file: {e}")
+        return
+    
 def post_generate_request(url, headers, payload, should_stream):
     """
     Make a POST request to the LLM API.

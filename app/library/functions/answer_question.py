@@ -1,7 +1,7 @@
 from pathlib import Path
 from alive_progress import alive_bar
 
-from ..helpers import generate, logger
+from ..helpers import generate, logger, get_report_template
 
 def answer_question( question, ollama_options, model_name, should_stream=False ):
     """
@@ -16,14 +16,9 @@ def answer_question( question, ollama_options, model_name, should_stream=False )
 
     logger.info(f"Answering question: {question}")
 
-    prompt_template_path = Path("prompts/prompt-question.txt")
-    try:
-        prompt_template = prompt_template_path.read_text(encoding="utf-8")
-    except FileNotFoundError:
-        logger.error(f"Template file not found: {prompt_template_path}")
-        return
-    except IOError as e:
-        logger.error(f"Error reading template file: {e}")
+    prompt_template = get_report_template("prompts/prompt-question.txt")
+
+    if not prompt_template:
         return
     
     generated = None
