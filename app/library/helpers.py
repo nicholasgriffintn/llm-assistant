@@ -6,6 +6,7 @@ import re
 import string
 import random
 from pathlib import Path
+import base64
 
 from .config import ollama_host, use_cloudflare, cloudflare_api_token, cloudflare_host, cloudflare_account_id, cloudflare_ai_endpoint
 
@@ -57,7 +58,7 @@ def get_report_template(path):
         logger.error(f"Error reading template file: {e}")
         return
     
-def post_generate_request(url, headers, payload, should_stream):
+def post_generate_request(url, headers, payload, should_stream, response_type="json"):
     """
     Make a POST request to the LLM API.
 
@@ -76,12 +77,15 @@ def post_generate_request(url, headers, payload, should_stream):
         response.raise_for_status()
 
         if should_stream:
-            print("Streaming")
             inference = response
             return inference
         else:
-            print("Not Streaming")
-            inference = response.json()
+            if response_type == "json":
+                inference = response.json()
+            if response_type == "binary":
+                inference = response.content
+            else:
+                inference = response.text
             return inference
     except requests.RequestException as e:
         logger.error(f"Request failed: {e}")
@@ -234,6 +238,44 @@ def generate_image_to_text(image, ollama_options, image_to_text_model_name):
         return result.get("description")
     else:
         return response_json.get("response")
+    
+def generate_text_to_image(prompt, options, text_to_image_model_name):
+    if use_cloudflare:
+        if not all([cloudflare_api_token, cloudflare_host, cloudflare_account_id, cloudflare_ai_endpoint]):
+            logger.error("Cloudflare API key, host, or account ID not set.")
+            return None
+        
+        url = f"{cloudflare_host}/{cloudflare_ai_endpoint}/{text_to_image_model_name}"
+        headers = {
+            "Authorization": f"Bearer {cloudflare_api_token}",
+        }
+        payload = {
+            "prompt": prompt,
+            "stream": False,
+            "seed": options.get("seed"),
+            "temperature": options.get("temperature"),
+            "top_k": options.get("top_k"),
+            "top_p": options.get("top_p"),
+        }
+    else:
+        url = f"{ollama_host}/api/generate"
+        headers = {}
+        payload = {
+            "prompt": prompt,
+            "model": text_to_image_model_name,
+            "stream": False,
+            "options": options
+        }
+
+    binary_data = post_generate_request(url, headers, payload, should_stream=False, response_type="binary")
+    if not binary_data:
+        return None
+    
+    if isinstance(binary_data, str):
+        binary_data = binary_data.encode('utf-8')
+
+    base64_encoded_data = base64.b64encode(binary_data).decode('utf-8')
+    return base64_encoded_data
 
 def check_summary(summary, article):
     """

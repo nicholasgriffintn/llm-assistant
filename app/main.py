@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 
 from .library.helpers import *
-from app.routers import summarise, analysis, question, chatbot
+from app.routers import summarise, analysis, question, chatbot, image
 
 load_dotenv()
 
@@ -28,6 +28,7 @@ app.include_router(summarise.router)
 app.include_router(analysis.router)
 app.include_router(question.router)
 app.include_router(chatbot.router)
+app.include_router(image.router)
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):

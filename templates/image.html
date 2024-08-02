@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% set active_page = "image" %}
+
+{% block title %}Generate Image{% endblock %}
+
+{% block head %}
+{{ super() }}
+
+
+{% endblock %}
+
+{% block page_content %}
+<main role="main" class="container">
+  <div class="row">
+    <div class="col">
+      <h1>Generate Image</h1>
+      {% if message %}
+      {{ message }}
+      {% endif %}
+      {% if result %}
+      <h2>The answer is:</h2>
+      <img src="data:image/png;base64,{{ result }}" alt="Result Image" />
+      {% endif %}
+      <h3>Submit Request</h3>
+      <form action="/image" method="post">
+        <label for="query">Enter the prompt to generate an image from:</label>
+        <textarea name="query" required></textarea>
+        <input type="submit" />
+      </form>
+    </div>
+  </div>
+</main>
+
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+
+{% endblock %}

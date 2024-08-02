@@ -8,3 +8,4 @@ More should be coming soon!
 - [Analyse Content](/analysis)
 - [Answer Questions](/question)
 - [Chatbot](/chatbot)
+- [Generate Images](/image)
