@@ -2,7 +2,8 @@ import os
 
 model_name = os.getenv("MODEL_NAME", "mistral-nemo")
 image_to_text_model_name = os.getenv("IMAGE_TO_TEXT_MODEL_NAME", "llava")
-text_to_image_model_name = os.getenv("TEXT_TO_IMAGE_MODEL_NAME", "llama")
+text_to_image_model_name = os.getenv("TEXT_TO_IMAGE_MODEL_NAME", "mistral-nemo")
+speech_recognition_model_name = os.getenv("SPEECH_RECOGNITION_MODEL_NAME", "mistral-nemo")
 
 ollama_options = {
     "seed": 42,

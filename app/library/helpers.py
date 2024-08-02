@@ -58,7 +58,7 @@ def get_report_template(path):
         logger.error(f"Error reading template file: {e}")
         return
     
-def post_generate_request(url, headers, payload, should_stream, response_type="json"):
+def post_generate_request(url, headers, payload, should_stream=False, response_type="json"):
     """
     Make a POST request to the LLM API.
 
@@ -194,6 +194,42 @@ def generate_and_check(prompt, ollama_options, model_name, article_text):
         return None
     
     return generation
+
+def generate_audio(audio, options, speech_recognition_model_name):
+    res = requests.get(audio)
+    blob = res.content
+
+    if not blob:
+        logger.error("No audio found.")
+        return None
+
+    if use_cloudflare:
+        if not all([cloudflare_api_token, cloudflare_host, cloudflare_account_id, cloudflare_ai_endpoint]):
+            logger.error("Cloudflare API key, host, or account ID not set.")
+            return None
+        
+        url = f"{cloudflare_host}/{cloudflare_ai_endpoint}/{speech_recognition_model_name}"
+        headers = {
+            "Authorization": f"Bearer {cloudflare_api_token}",
+        }
+        payload = {
+            "audio": list(blob),
+        }
+    else:
+        url = f"{ollama_host}/api/generate"
+        headers = {}
+        payload = {
+            "audio": list(blob),
+            "model": speech_recognition_model_name,
+            "stream": False,
+            "options": options
+        }
+
+    response_json = post_generate_request(url, headers, payload, should_stream=False)
+    if not response_json:
+        return None
+    
+    return response_json;
 
 def generate_image_to_text(image, ollama_options, image_to_text_model_name):
     res = requests.get(image)

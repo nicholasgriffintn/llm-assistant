@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% set active_page = "speech" %}
+
+{% block title %}Recognise Speech{% endblock %}
+
+{% block head %}
+{{ super() }}
+
+
+{% endblock %}
+
+{% block page_content %}
+<main role="main" class="container">
+  <div class="row">
+    <div class="col">
+      <h1>Recognise Speech</h1>
+      {% if message %}
+      {{ message }}
+      {% endif %}
+      {% if result %}
+      <h2>The answer is:</h2>
+      <figure>
+        <figcaption>Listen to the Audio:</figcaption>
+        <audio controls src="{{ query }}"></audio>
+        <a href="{{ query }}"> Download audio </a>
+      </figure>
+      <pre>{{result}}</pre>
+      {% endif %}
+      <h3>Submit Request</h3>
+      <form action="/speech" method="post">
+        <label for="query">Provide a URL of the audio:</label>
+        <input type="url" name="query" required />
+        <small>
+          <a
+            href="https://github.com/Azure-Samples/cognitive-services-speech-sdk/tree/master/samples/cpp/windows/console/samples">
+            Sample audio files
+          </a>
+        </small>
+        <input type="submit" />
+      </form>
+    </div>
+  </div>
+</main>
+
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+
+{% endblock %}

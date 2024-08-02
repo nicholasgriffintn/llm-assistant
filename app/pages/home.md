@@ -9,3 +9,4 @@ More should be coming soon!
 - [Answer Questions](/question)
 - [Chatbot](/chatbot)
 - [Generate Images](/image)
+- [Recognise Speech](/speech)
