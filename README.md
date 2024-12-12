@@ -1,7 +1,9 @@
 ## LLM Assistant
 
+> Update: This funcationality has now moved to my new assistant project which is running in TypeScript and includes a range of features, not just article analysis and questions.
+
 ## Introduction
-The goal of this project is to develop an advanced assistant using the Large Language Model (LLM) architecture, specifically leveraging the capabilities of the Mixtral model.
+The goal of this project is to develop an advanced assistant using the Large Language Model (LLM) architecture, specifically leveraging the capabilities of the Mistral model.
 
 ## Features
 
